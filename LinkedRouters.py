@@ -1,13 +1,4 @@
-class Router:
-    def __init__(self, name, cola_origen, cola_forward):
-        self.name = name
-        self.received_messages = [] 
-        self.is_active = True
-        self.messages_forward = None
-        self.messages_local = None
-        self.next = None
-
-
+from collections import deque
 
 class LinkedList:
     def __init__(self):
@@ -81,3 +72,39 @@ class LinkedList:
             print(current.name, end=" ")
             current = current.next
         print()
+
+
+class Router:
+    def __init__(self, name, cola_origen, cola_forward):
+        self.name = name
+        self.received_messages = []
+        self.is_active = True
+        self.messages_forward = Queue()
+        self.messages_local = Queue()
+        self.next = None
+
+
+class Colas():
+    def _init_(self):
+        self.paquetes_esperando = []
+
+    def agregar_paquete(self, paquete): #Se agrega un paquete a la cola de paquetes
+        self.paquetes_esperando.append(paquete)
+
+    def sale_paquete(self): #Sale el paquete que llegó primero a la cola 
+        return self.paquetes_esperando.popleft()
+
+    def hay_paquetes(self): #Dice si quedan paquetes en la cola 
+        return len(self.paquetes_otros) > 0
+
+class Paquete():
+    def __init__(self, mensaje, origen, destino, horario):
+        self.mensaje = mensaje
+        self.origen = origen
+        self.destino = destino
+        self.horario = horario
+
+    def _str_(self):
+        return f"El mensaje ({self.mensaje}), proviene del router {self.origen}, el destino es el router {self.destino}, y fue enviado en el horario {self.horario}."
+    
+    
