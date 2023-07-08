@@ -79,8 +79,8 @@ class Router:
         self.name = name
         self.received_messages = []
         self.is_active = True
-        self.messages_forward = Queue()
-        self.messages_local = Queue()
+        self.messages_forward = Colas()
+        self.messages_local = Colas()
         self.next = None
 
 
