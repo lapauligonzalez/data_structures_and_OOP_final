@@ -1,5 +1,5 @@
 class Paquetes():
-    def _init_(self, mensaje, origen, destino, horario):
+    def __init__(self, mensaje, origen, destino, horario):
         self.mensaje = mensaje
         self.origen = origen
         self.destino = destino
