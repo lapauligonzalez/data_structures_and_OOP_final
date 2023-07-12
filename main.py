@@ -19,23 +19,22 @@ class RoutingSim:
 
 
     def escribir_archivo(self): #Genera el archivo con los paquetes recibidos en ese router para imprimirlo al final del programa
-      current = self.red.head
-      for i in range(self.red.size):
-        nueva_lista = []
-        router_agregar = self.red.head
-        while len(nueva_lista)<7: 
-            if router_agregar.id != current.id:
-                nueva_lista.append(router_agregar)
-            router_agregar = router_agregar.next
-        for i in range(len(nueva_lista)):
-            print(nueva_lista[i].id)
-        with open(f"{current.id}.txt", mode="w") as txt_file: #Aca creamos un archivo .txt por ese router
-            for router in nueva_lista:
-                txt_file.write("\n\nOrigen: " + str(router.id) + "\n")
-                for i in range(len(current.paquetes_recibidos)):
-                    if current.paquetes_recibidos[i].origen == router.id:
-                        txt_file.write(current.paquetes_recibidos[i].mensaje + "\n")
-                    
+        current = self.red.head
+        for i in range(self.red.size):
+            nueva_lista = [] #Genera una lista con los routers excluyendo al que estamos parados para poder hacer el .txt prolijo
+            router_agregar = self.red.head
+            while len(nueva_lista) < self.red.size: 
+                if router_agregar.id != current.id:
+                    nueva_lista.append(router_agregar)
+                router_agregar = router_agregar.next
+            with open(f"{current.id}.txt", mode="w") as txt_file: #Aca creamos un archivo .txt por ese router
+                for router in nueva_lista:
+                    txt_file.write("\n\nOrigen: " + str(router.id) + "\n")
+                    for i in range(len(current.paquetes_recibidos)):
+                        if current.paquetes_recibidos[i].origen == router.id:
+                            txt_file.write(current.paquetes_recibidos[i].mensaje + "\n")
+            current = current.next
+                        
         
     def grafico_barras(self):
       cantidad_paquetes = []
@@ -54,9 +53,8 @@ class RoutingSim:
     def desactivar(self, contador_de_ciclos):
         current = self.red.head
         for i in range(self.red.size):
-            num = random.randint(1,5)
+            num = random.randint(1,1000)
             if num == 1:
-                print("INACTIVOOOOOOOOO")
                 current.cambiar_estado("INACTIVO")
                 current.cambiar_estado("EN_RESET")
                 current.inactivo_hasta = contador_de_ciclos + random.randint(50,100)
@@ -72,6 +70,9 @@ class RoutingSim:
                     continue
                 print(self.red.inactivos[i].id)
                 posicion_del_actual = int(self.red.inactivos[i].id[-1])
+                if self.red.is_empty():
+                    self.red.prepend(self.red.inactivos[i])
+                    continue
                 current = self.red.head
                 current_posicion = int(current.id[-1])
                 prev = None
@@ -79,9 +80,10 @@ class RoutingSim:
                     current_posicion = int(current.id[-1])
                     prev = current
                     current = current.next
+                else:
+                    self.red.prepend(self.red.inactivos[i])
                 self.red.insert_after(prev.id, self.red.inactivos[i])
                 current = self.red.head
-                print("ACTIVOOOOOOOOOO")
                 for j in range(self.red.size):
                     if current.id == self.red.inactivos[i].id:
                         current.cambiar_estado("ACTIVO")

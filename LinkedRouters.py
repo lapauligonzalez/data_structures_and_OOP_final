@@ -4,6 +4,9 @@ import csv
 import os
 import random
 
+if os.path.isfile("system_log.csv"): #Borra el archivo de system_log para que no se apendee abajo de una simulacion anterior
+  os.remove("system_log.csv")
+
 class LinkedList:
     def __init__(self):
         self.head = None
@@ -50,6 +53,7 @@ class LinkedList:
             current.next = new_router
             new_router.next = self.head
             self.head = new_router
+            new_router.cambiar_estado("ACTIVO")
             self.size += 1
 
 
@@ -79,6 +83,8 @@ class LinkedList:
 
         prev.next = current.next
         self.size -= 1
+        if self.size == 0:
+            self.head = None
 
     def distribucion_paquetes_origen(self, desde, horario): #Lee el archivo de los paquetes y distribuye los mensajes en los router origen
         main_path = os.path.abspath(__file__)
