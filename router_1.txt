@@ -16,6 +16,3 @@ Origen: router_6
 
 
 Origen: router_7
-
-
-Origen: router_2

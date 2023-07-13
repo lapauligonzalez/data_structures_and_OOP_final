@@ -23,7 +23,7 @@ class RoutingSim:
         for i in range(self.red.size):
             nueva_lista = [] #Genera una lista con los routers excluyendo al que estamos parados para poder hacer el .txt prolijo
             router_agregar = self.red.head
-            while len(nueva_lista) < self.red.size: 
+            for router in range(self.red.size):
                 if router_agregar.id != current.id:
                     nueva_lista.append(router_agregar)
                 router_agregar = router_agregar.next
@@ -56,7 +56,9 @@ class RoutingSim:
             num = random.randint(1,1000)
             if num == 1:
                 current.cambiar_estado("INACTIVO")
+                print(current.id + " " + current.estado)
                 current.cambiar_estado("EN_RESET")
+                print(current.id + " " + current.estado)
                 current.inactivo_hasta = contador_de_ciclos + random.randint(50,100)
                 self.red.inactivos.append(current)
                 self.red.delete(current.id)
@@ -87,8 +89,9 @@ class RoutingSim:
                 for j in range(self.red.size):
                     if current.id == self.red.inactivos[i].id:
                         current.cambiar_estado("ACTIVO")
+                        print(current.id + " " + current.estado)
                     current = current.next
-                self.red.inactivos.remove[i]
+                self.red.inactivos.remove(i)
 
     def simulacion(self):
         self.agrega_routers()
@@ -98,18 +101,17 @@ class RoutingSim:
         while contador_de_ciclos < total_ciclos: 
             horario += timedelta(seconds=0.1)
             self.red.distribucion_paquetes_origen(contador_de_ciclos*100, horario)
-            print("paquetes distribuidos")
             
             self.reactivacion(contador_de_ciclos, False)
             self.desactivar(contador_de_ciclos)
 
             current = self.red.head
             for i in range(self.red.size):
+                print(i)
                 current.distribuir_mensajes_llegada()
-                print("mensajes llegada distribuidos")
                 current.pasar_mensajes()
                 current = current.next
-                print("mensajes enviados al siguiente router")
+
             contador_de_ciclos +=1
 
         self.reactivacion(contador_de_ciclos, True)
@@ -117,6 +119,7 @@ class RoutingSim:
         for i in range(1,self.red.size + 1):
             current.enviados_vs_recibidos()
             current = current.next
+        
         self.escribir_archivo()
         print("El programa ha finalizado")
 
@@ -132,16 +135,3 @@ programa = RoutingSim(segundos)
 
 programa.simulacion()
 
-
-
-
-  # def desactivar(self):
-    #     current = self.head
-    #     for i in range(self.size):
-    #         num = random.randint(1,100)
-    #         if num == 42:
-    #             current.cambiar_estado("INACTIVO")
-    #             self.inactivos.append(current)
-    #             self.delete(current.id)
-    #         current = current.next
-    

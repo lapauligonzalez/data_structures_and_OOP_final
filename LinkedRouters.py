@@ -4,7 +4,7 @@ import csv
 import os
 import random
 
-if os.path.isfile("system_log.csv"): #Borra el archivo de system_log para que no se apendee abajo de una simulacion anterior
+if os.path.isfile("system_log.csv"): #Borra el archivo de system_log para que no se appendee abajo de una simulacion anterior
   os.remove("system_log.csv")
 
 class LinkedList:
@@ -109,18 +109,10 @@ class LinkedList:
                     for i in range(len(self.inactivos)):
                         if origen == self.inactivos[i].id:
                             self.inactivos[i].paquetes_locales.agregar_paquete(Paquete(mensaje, origen, destino, horario))
+                    
                 contador +=1
 
-    def pasar_mensajes(self,id): 
-        current = self.head
-        while current.id != id:
-            current = current.next
-        for i in range(current.paquetes_transitorios.size):
-            paquete_enviado = current.paquetes_transitorios.sale_paquete()
-            current.next.paquetes_llegada.agregar_paquete(paquete_enviado)
-        for i in range(current.paquetes_locales.size):
-            paquete_enviado = current.paquetes_locales.sale_paquete()
-            current.next.paquetes_llegada.agregar_paquete(paquete_enviado)
+
 
     
         
@@ -139,11 +131,6 @@ class Router:
 
     def __str__(self):
         return f"{self.id}"
-
-    def escribir_archivo(self): #Genera el archivo con los paquetes recibidos en ese router para imprimirlo al final del programa
-        with open(f"{self.id}.txt", mode="w") as txt_file:
-            for paquete in self.paquetes_recibidos:
-                txt_file.write(str(paquete) + "\n")
 
     def enviados_vs_recibidos(self):
         n=(self.contador_transitorios/(self.contador_transitorios+len(self.paquetes_recibidos)))*100
