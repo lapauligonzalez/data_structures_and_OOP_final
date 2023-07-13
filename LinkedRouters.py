@@ -14,7 +14,10 @@ class LinkedList:
         self.inactivos = []
 
     def is_empty(self):
-        return self.head is None
+        if self.size == 0:
+            return True
+        else:
+            return False
 
     def __str__(self):
         nodo = self.head
@@ -39,7 +42,6 @@ class LinkedList:
             current.next = new_router #el proximo nodo va a ser el nuevo router
             new_router.next = self.head #hacemos que la lista sea circular
             self.size += 1
-        new_router.cambiar_estado("AGREGADO")
         new_router.cambiar_estado("ACTIVO")
 
     def prepend(self, new_router): #Para agregar un router al principio de la lista
@@ -101,14 +103,16 @@ class LinkedList:
                 break
             if ',' in line:
                 origen, destino, mensaje = line.strip().split(",")
-                current = self.head
 
+                current = self.head
                 for i in range(self.size):
                     if origen == current.id:
                         current.paquetes_locales.agregar_paquete(Paquete(mensaje, origen, destino, horario)) #Agrega el paquete en la cola origen del router
                     for i in range(len(self.inactivos)):
                         if origen == self.inactivos[i].id:
                             self.inactivos[i].paquetes_locales.agregar_paquete(Paquete(mensaje, origen, destino, horario))
+                    current = current.next
+                            
                     
                 contador +=1
 

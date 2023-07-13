@@ -14,6 +14,7 @@ class RoutingSim:
         for i in range(1, 8):
             router = Router(i)
             print("Se creo el " + router.id)
+            router.cambiar_estado("AGREGADO")
             self.red.append(router)
 
 
@@ -53,52 +54,78 @@ class RoutingSim:
     def desactivar(self, contador_de_ciclos):
         current = self.red.head
         for i in range(self.red.size):
-            num = random.randint(1,1000)
+            num = random.randint(1,500)
             if num == 1:
                 current.cambiar_estado("INACTIVO")
                 print(current.id + " " + current.estado)
                 current.cambiar_estado("EN_RESET")
                 print(current.id + " " + current.estado)
                 current.inactivo_hasta = contador_de_ciclos + random.randint(50,100)
+                print(current.inactivo_hasta)
                 self.red.inactivos.append(current)
                 self.red.delete(current.id)
             current = current.next
 
-    def reactivacion(self, contador_de_ciclos, fin):
-        for i in range(len(self.red.inactivos)):
-            if self.red.inactivos[i].inactivo_hasta == contador_de_ciclos or fin:
-                if self.red.inactivos[i].id == "router_1":
+    def reactivacion(self, contador_de_ciclos, end):
+        for i in range(0,len(self.red.inactivos)-1):
+            if self.red.inactivos[i].inactivo_hasta == contador_de_ciclos or end:
+                print("Reavtivar router: ")
+                if self.red.inactivos[i].id == "router_1": # Agregamos al 1 al head siempre que se vuelve a activar
+                    self.red.inactivos[i].cambiar_estado("ACTIVO")
+                    print(self.red.inactivos[i].id + " ACTIVO")
                     self.red.prepend(self.red.inactivos[i])
+                    del self.red.inactivos[i]
                     continue
-                print(self.red.inactivos[i].id)
-                posicion_del_actual = int(self.red.inactivos[i].id[-1])
-                if self.red.is_empty():
+                if self.red.inactivos[i].id == "router_7": # Agregamos al 7 al final siempre que se vuelve a activar 
+                    self.red.inactivos[i].cambiar_estado("ACTIVO")
+                    print(self.red.inactivos[i].id + " ACTIVO")
+                    self.red.append(self.red.inactivos[i])
+                    del self.red.inactivos[i]
+                    continue
+                if self.red.is_empty(): # Agregamos al head si es que la lista esta vacia
+                    self.red.inactivos[i].cambiar_estado("ACTIVO")
+                    print(self.red.inactivos[i].id + " ACTIVO")
                     self.red.prepend(self.red.inactivos[i])
+                    del self.red.inactivos[i]
                     continue
+                posicion_del_actual = int(self.red.inactivos[i].id[-1]) #Buscamos la posicion que deberia ocupar el inactivo si estuviera la lista completa
+                posicion_head = int(self.red.head.id[-1]) #buscamos la posicion que tendria que tener el head si la lista estuviera completa
+                if posicion_head > posicion_del_actual: # Agregamos al head si no hay menor
+                    self.red.inactivos[i].cambiar_estado("ACTIVO")
+                    print(self.red.inactivos[i].id + " ACTIVO")
+                    self.red.prepend(self.red.inactivos[i])
+                    del self.red.inactivos[i]
                 current = self.red.head
                 current_posicion = int(current.id[-1])
                 prev = None
-                while current_posicion < posicion_del_actual:
-                    current_posicion = int(current.id[-1])
+                for j in range(self.red.size): # Agregamos al desactivado despues de el menor anterior al mayor
+                    if current_posicion > posicion_del_actual:
+                        self.red.inactivos[i].cambiar_estado("ACTIVO")
+                        print(self.red.inactivos[i].id + " ACTIVO")
+                        self.red.insert_after(prev.id, self.red.inactivos[i])
+                        del self.red.inactivos[i]
+                        break
                     prev = current
                     current = current.next
-                else:
-                    self.red.prepend(self.red.inactivos[i])
-                self.red.insert_after(prev.id, self.red.inactivos[i])
-                current = self.red.head
-                for j in range(self.red.size):
-                    if current.id == self.red.inactivos[i].id:
-                        current.cambiar_estado("ACTIVO")
-                        print(current.id + " " + current.estado)
-                    current = current.next
-                self.red.inactivos.remove(i)
+                    current_posicion = int(current.id[-1])
+                if posicion_del_actual > current_posicion:
+                    current.cambiar_estado("ACTIVO")
+                    print(current.id + " ACTIVO")
+                    self.red.append(self.red.inactivos[i]) # Agregamos al final si no hay mayor
+                    del self.red.inactivos[i]
+
+        for i in range(len(self.red.inactivos)):
+            print(self.red.inactivos[i])
+
 
     def simulacion(self):
         self.agrega_routers()
         total_ciclos = int(segundos)*10
         contador_de_ciclos = 0
         horario = self.horario_inicial
+        print(str(total_ciclos))
         while contador_de_ciclos < total_ciclos: 
+            print("Ciclo: " + str(contador_de_ciclos))
             horario += timedelta(seconds=0.1)
             self.red.distribucion_paquetes_origen(contador_de_ciclos*100, horario)
             
@@ -107,7 +134,6 @@ class RoutingSim:
 
             current = self.red.head
             for i in range(self.red.size):
-                print(i)
                 current.distribuir_mensajes_llegada()
                 current.pasar_mensajes()
                 current = current.next
